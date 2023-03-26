@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +35,7 @@ class PostsRepositoryTest {
     @Autowired
     private PostsRepository postsRepository;
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception{
         postsRepository.deleteAll();
     }
@@ -90,5 +92,27 @@ class PostsRepositoryTest {
         List<Posts> all = postsRepository.findAll();
         Assertions.assertThat(all.get(0).getTitle()).isEqualTo(expectedTitle);
         Assertions.assertThat(all.get(0).getContent()).isEqualTo(expectedContent);
+    }
+
+    @Test
+    public void BaseTimeEntity_등록(){
+        ///given
+        LocalDateTime now = LocalDateTime.of(2023, 3, 26, 0, 0, 0);
+        postsRepository.save(Posts.builder()
+                .title("title")
+                .content("contend")
+                .author("author")
+                .build());
+
+        //when
+        List<Posts> postsList = postsRepository.findAll();
+
+        //then
+        Posts posts = postsList.get(0);
+
+        System.out.println(">>>>>>>> createDate=" + posts.getCreatedDate() + ", modifiedDate=" + posts.getModifiedDate());
+
+        Assertions.assertThat(posts.getCreatedDate()).isAfter(now);
+        Assertions.assertThat(posts.getModifiedDate()).isAfter(now);
     }
 }
